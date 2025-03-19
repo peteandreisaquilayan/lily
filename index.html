@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Hello, World!</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+      <h1 class="title">Hello World! </h1>
+      <p id="currentTime"></p>
+      <script src="script.js"></script>
+  </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Wordle - CHOCO</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #121213;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .tile {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #3a3a3c;
+            font-size: 32px;
+            font-weight: bold;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #121213;
+            color: white;
+        }
+        .correct { background-color: #538d4e; border-color: #538d4e; }
+        .present { background-color: #b59f3b; border-color: #b59f3b; }
+        .absent { background-color: #3a3a3c; border-color: #3a3a3c; }
+        input {
+            font-size: 20px;
+            text-transform: uppercase;
+            padding: 10px;
+            margin-top: 20px;
+            text-align: center;
+            width: 150px;
+        }
+        #message { margin-top: 20px; font-size: 24px; }
+        #link { display: none; margin-top: 20px; font-size: 20px; color: #538d4e; }
+        button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #538d4e;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Wordle Clone</h1>
+    <div id="grid-container"></div>
+    <input type="text" id="guess" maxlength="5" autofocus oninput="this.value = this.value.replace(/[^a-zA-Z]/g, '')">
+    <button onclick="checkWord()">Submit</button>
+    <button onclick="restartGame()">Restart</button>
+    <p id="message"></p>
+    <p id="link"><a href="https://verzonlily.carrd.co/" target="_blank">Click meee!!</a></p>
+
+    <script>
+        const correctWord = "CHOCO";
+        const maxAttempts = 6;
+        let attempt = 0;
+
+        function createGrid() {
+            const container = document.getElementById("grid-container");
+            container.innerHTML = "";
+            for (let i = 0; i < maxAttempts; i++) {
+                const row = document.createElement("div");
+                row.classList.add("grid");
+                for (let j = 0; j < 5; j++) {
+                    const tile = document.createElement("div");
+                    tile.classList.add("tile");
+                    row.appendChild(tile);
+                }
+                container.appendChild(row);
+            }
+        }
+
+        function checkWord() {
+            let guessInput = document.getElementById("guess");
+            let guess = guessInput.value.toUpperCase();
+            if (guess.length !== 5 || attempt >= maxAttempts) return;
+
+            let rows = document.querySelectorAll(".grid");
+            let tiles = rows[attempt].children;
+
+            for (let i = 0; i < 5; i++) {
+                tiles[i].innerText = guess[i];
+                tiles[i].className = "tile";
+                if (guess[i] === correctWord[i]) {
+                    tiles[i].classList.add("correct");
+                } else if (correctWord.includes(guess[i])) {
+                    tiles[i].classList.add("present");
+                } else {
+                    tiles[i].classList.add("absent");
+                }
+            }
+
+            if (guess === correctWord) {
+                document.getElementById("message").innerText = "YAAYYYY good job, my lily.";
+                document.getElementById("link").style.display = "block";
+                confetti();
+                return;
+            }
+
+            attempt++;
+            if (attempt >= maxAttempts) {
+                document.getElementById("message").innerText = "Game Over! The word was CHOCO.";
+            } else {
+                document.getElementById("message").innerText = "Try again!";
+            }
+            guessInput.value = "";
+        }
+
+        function confetti() {
+            let confettiCount = 100;
+            let emojis = ["🌼", "🌼", "🌼"];
+            for (let i = 0; i < confettiCount; i++) {
+                let confettiPiece = document.createElement("div");
+                confettiPiece.innerText = emojis[Math.floor(Math.random() * emojis.length)];
+                confettiPiece.style.position = "absolute";
+                confettiPiece.style.left = Math.random() * window.innerWidth + "px";
+                confettiPiece.style.top = Math.random() * window.innerHeight + "px";
+                document.body.appendChild(confettiPiece);
+                setTimeout(() => confettiPiece.remove(), 2000);
+            }
+        }
+
+        function restartGame() {
+            attempt = 0;
+            document.getElementById("message").innerText = "";
+            document.getElementById("link").style.display = "none";
+            document.getElementById("guess").value = "";
+            createGrid();
+        }
+
+        document.getElementById("guess").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                checkWord();
+            }
+        });
+
+        createGrid();
+    </script>
+</body>
+</html>
